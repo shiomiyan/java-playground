@@ -6,6 +6,11 @@ alert();
 ここは
 複数行のコメント
 */
+var add = function(a, b) {
+    return a +
+    // crazy comment
+    b;
+}
 // 文字列が閉じられていない + 閉じカッコがない
 alert(";
 /*
