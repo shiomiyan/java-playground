@@ -30,8 +30,9 @@ public class Main {
         System.out.println(new String(result));
     }
 
+    private static int lastEndByte = 0;
+
     public static byte[] traverse(TSNode node, byte[] code, ByteArrayOutputStream parts) throws IOException {
-        int startByte = node.getStartByte();
         int endByte = node.getEndByte();
         boolean hasChild = node.getChildCount() > 0;
 
@@ -41,10 +42,10 @@ public class Main {
             }
         } else {
             if (!node.getType().equalsIgnoreCase("comment")) {
-                parts.write(Arrays.copyOfRange(code, startByte, endByte));
+                parts.write(Arrays.copyOfRange(code, lastEndByte, endByte));
             }
         }
-
+        lastEndByte = endByte;
         return parts.toByteArray();
     }
 }
