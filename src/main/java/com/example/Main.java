@@ -30,10 +30,10 @@ public class Main {
         System.out.println(new String(result));
     }
 
-    private static int lastEndByte = 0;
+    private static int prevEndByte = 0;
 
     public static byte[] traverse(TSNode node, byte[] code, ByteArrayOutputStream parts) throws IOException {
-        int endByte = node.getEndByte();
+        int currEndByte = node.getEndByte();
         boolean hasChild = node.getChildCount() > 0;
 
         if (hasChild) {
@@ -42,10 +42,10 @@ public class Main {
             }
         } else {
             if (!node.getType().equalsIgnoreCase("comment")) {
-                parts.write(Arrays.copyOfRange(code, lastEndByte, endByte));
+                parts.write(Arrays.copyOfRange(code, prevEndByte, currEndByte));
             }
         }
-        lastEndByte = endByte;
+        prevEndByte = currEndByte;
         return parts.toByteArray();
     }
 }
