@@ -38,6 +38,7 @@ public class TSPlayground {
             }
         } else {
             if (!node.getType().equalsIgnoreCase("comment")) {
+                // https://github.com/bonede/tree-sitter-ng/issues/19#issuecomment-2130987620
                 parts.write(Arrays.copyOfRange(code, prevEndByte, currEndByte));
             }
         }

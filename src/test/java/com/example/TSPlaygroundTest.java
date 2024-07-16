@@ -4,18 +4,16 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.treesitter.TSLanguage;
-import org.treesitter.TreeSitterJavascript;
+import org.junit.jupiter.api.*;
+import org.treesitter.*;
 
 public class TSPlaygroundTest {
-    TSPlayground playground = new TSPlayground();
 
     @Nested
     public class TSPlaygroundForJavascript {
+        TSPlayground playground = new TSPlayground();
         TSLanguage javascript = new TreeSitterJavascript();
 
         @Test
@@ -33,7 +31,7 @@ public class TSPlaygroundTest {
 
             assertThat(result.trim()).isEqualTo(expect);
         }
-        
+
         @Test
         @DisplayName("複数行コメントを削除できること")
         void testRemoveMultiLineComment() throws IOException {
@@ -74,7 +72,7 @@ public class TSPlaygroundTest {
 
             assertThat(result.trim()).isEqualTo(expect);
         }
-        
+
         @Test
         @DisplayName("構文エラーを含むコードでもコメントを削除できること")
         void testRemoveCommentWithInvalidSyntax() throws IOException {
