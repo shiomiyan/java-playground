@@ -19,7 +19,7 @@ public class TSPlayground {
     public String removeComment(TSLanguage lang, String code) throws IOException {
         TSParser parser = new TSParser();
         parser.setLanguage(lang);
-        TSTree tree = parser.parseStringEncoding(null, code, TSInputEncoding.TSInputEncodingUTF8);
+        TSTree tree = parser.parseString(null, code);
         TSNode rootNode = tree.getRootNode();
 
         var result = traverse(rootNode, code.getBytes(StandardCharsets.UTF_8), new ByteArrayOutputStream());

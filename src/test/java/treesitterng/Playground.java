@@ -12,6 +12,35 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class Playground {
     @Test
+    void emojiOverflowTest() {
+        // https://github.com/bonede/tree-sitter-ng/issues/36
+
+        TSParser parser = new TSParser();
+        TSLanguage javascript = new TreeSitterJavascript();
+        parser.setLanguage(javascript);
+
+        String code = """
+                // 😭
+                a();
+                // 😭
+                b();
+                // 😭
+                c();
+                // 😭
+                d();""";
+
+        TSTree tree = parser.parseString(null, code);
+        TSNode rootNode = tree.getRootNode();
+        int startByte = rootNode.getStartByte();
+        int endByte = rootNode.getEndByte();
+
+        byte[] codeBytes = code.getBytes(StandardCharsets.UTF_8);
+        byte[] rootNodeBytes = Arrays.copyOfRange(codeBytes, startByte, endByte);
+
+        assertThat(new String(rootNodeBytes, StandardCharsets.UTF_8)).isEqualTo(code);
+    }
+
+    @Test
     void emojiTest() {
         // https://github.com/bonede/tree-sitter-ng/issues/36
 
@@ -21,10 +50,9 @@ public class Playground {
 
         String code = """
                 // 😭
-                foo();
-                """;
+                foo();""";
 
-        TSTree tree = parser.parseStringEncoding(null, code, TSInputEncoding.TSInputEncodingUTF8);
+        TSTree tree = parser.parseString(null, code);
         TSNode rootNode = tree.getRootNode();
 
         TSNode commentNode = rootNode.getChild(0);
@@ -36,6 +64,31 @@ public class Playground {
         String commentString = new String(commentNodeBytes, StandardCharsets.UTF_8);
 
         assertThat(commentString).isEqualTo("// 😭");
+    }
+
+    @Test
+    void jsonEmojiTest() {
+        // https://github.com/bonede/tree-sitter-ng/issues/36
+
+        TSParser parser = new TSParser();
+        TSLanguage javascript = new TreeSitterJson();
+        parser.setLanguage(javascript);
+
+        String code = """
+                ["😭", "foo"]""";
+
+        TSTree tree = parser.parseString(null, code);
+        TSNode rootNode = tree.getRootNode();
+
+        TSNode commentNode = rootNode.getChild(0);
+        int startByte = commentNode.getStartByte();
+        int endByte = commentNode.getEndByte();
+
+        byte[] codeBytes = code.getBytes(StandardCharsets.UTF_8);
+        byte[] commentNodeBytes = Arrays.copyOfRange(codeBytes, startByte, endByte);
+        String commentString = new String(commentNodeBytes, StandardCharsets.UTF_8);
+
+        assertThat(commentString).isEqualTo("[\"😭\", \"foo\"]");
     }
 
 

@@ -96,14 +96,45 @@ public class TSPlaygroundTest {
         }
 
         @Test
-        @DisplayName("サロゲートペア（絵文字）が混入してもコメントを削除できること")
-        void testRemoveCommentWithEmoji() throws IOException {
+        @DisplayName("サロゲートペア（絵文字）が混入してもコメントを削除できること（UTF-8）")
+        void testRemoveCommentWithEmojiUtf8() throws IOException {
+            String yoshi = Character.toString(0x20bb7);
+
+            byte[] bytes = String.format("""
+                    // ほっけ[%s]
+                    alert("STRING HERE"); // 白い笑顔[%s]
+                    /* はしご高[%s] */
+                    function foo() {
+                        var %s = "ﾖｼ";
+                    }
+                    """,
+                    Character.toString(0x29E3D),
+                    Character.toString(0x0263A),
+                    Character.toString(0x09AD9),
+                    yoshi
+            ).getBytes(StandardCharsets.UTF_8);
+
+            String code = new String(bytes, StandardCharsets.UTF_8);
+            var result = playground.removeComment(javascript, code);
+
+            String expect = String.format("""
+                    alert("STRING HERE");
+                    function foo() {
+                        var %s = "ﾖｼ";
+                    }""", yoshi);
+
+            assertThat(result.trim()).isEqualTo(expect);
+        }
+
+        @Test
+        @DisplayName("サロゲートペア（絵文字）が混入してもコメントを削除できること（UTF-16）")
+        void testRemoveCommentWithEmojiUtf16() throws IOException {
             byte[] bytes = """
                     // 😭
                     alert("STRING HERE");
-                    """.getBytes(StandardCharsets.UTF_8);
+                    """.getBytes(StandardCharsets.UTF_16);
 
-            String code = new String(bytes, StandardCharsets.UTF_8);
+            String code = new String(bytes, StandardCharsets.UTF_16);
             var result = playground.removeComment(javascript, code);
 
             String expect = """

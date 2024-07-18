@@ -27,6 +27,18 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/io.github.bonede/tree-sitter-json -->
+        <dependency>
+            <groupId>io.github.bonede</groupId>
+            <artifactId>tree-sitter-json</artifactId>
+            <version>0.21.0a</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.github.bonede</groupId>
+                    <artifactId>tree-sitter</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>io.github.bonede</groupId>
             <artifactId>tree-sitter</artifactId>
