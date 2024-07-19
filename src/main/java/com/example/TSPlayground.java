@@ -1,15 +1,14 @@
 package com.example;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-
-import org.treesitter.TSInputEncoding;
 import org.treesitter.TSLanguage;
 import org.treesitter.TSNode;
 import org.treesitter.TSParser;
 import org.treesitter.TSTree;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 /**
  * tree-sitter playground.
@@ -22,27 +21,25 @@ public class TSPlayground {
         TSTree tree = parser.parseString(null, code);
         TSNode rootNode = tree.getRootNode();
 
-        var result = traverse(rootNode, code.getBytes(StandardCharsets.UTF_8), new ByteArrayOutputStream());
-        return new String(result, StandardCharsets.UTF_8);
+        try (var result = new ByteArrayOutputStream()) {
+            traverse(rootNode, code.getBytes(StandardCharsets.UTF_8), result, 0);
+            return result.toString(StandardCharsets.UTF_8);
+        }
     }
 
-    private int prevEndByte = 0;
-
-    private byte[] traverse(TSNode node, byte[] code, ByteArrayOutputStream parts) throws IOException {
+    private int traverse(TSNode node, byte[] code, ByteArrayOutputStream parts, int prevEndByte) throws IOException {
         int currEndByte = node.getEndByte();
         boolean hasChild = node.getChildCount() > 0;
 
         if (hasChild) {
             for (var i = 0; i < node.getChildCount(); i++) {
-                traverse(node.getChild(i), code, parts);
+                prevEndByte = traverse(node.getChild(i), code, parts, prevEndByte);
             }
-        } else {
-            if (!node.getType().equalsIgnoreCase("comment")) {
-                // https://github.com/bonede/tree-sitter-ng/issues/19#issuecomment-2130987620
-                parts.write(Arrays.copyOfRange(code, prevEndByte, currEndByte));
-            }
+        } else if (!node.getType().equalsIgnoreCase("comment")) {
+            // https://github.com/bonede/tree-sitter-ng/issues/19#issuecomment-2130987620
+            parts.write(Arrays.copyOfRange(code, prevEndByte, currEndByte));
         }
-        prevEndByte = currEndByte;
-        return parts.toByteArray();
+
+        return currEndByte;
     }
 }
