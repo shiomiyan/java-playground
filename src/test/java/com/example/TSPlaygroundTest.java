@@ -177,9 +177,9 @@ public class TSPlaygroundTest {
 
         @Test
         @DisplayName("だいたいいい感じにコメントを削除できる")
-        void testRemoveComment() throws IOException {
+        void testRemoveCommentBrokenSyntax1() throws IOException {
             ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-            byte[] bytes = classloader.getResourceAsStream("main.js").readAllBytes();
+            byte[] bytes = classloader.getResourceAsStream("broken-syntax-1.js").readAllBytes();
 
             String code = new String(bytes, StandardCharsets.UTF_8);
             var result = TSPlayground.removeComment(javascript, code);
@@ -188,14 +188,67 @@ public class TSPlaygroundTest {
                 const s = "STRING HERE";
                 人類社会のすべての構成員の固有の尊厳と平等で譲ることのできない権利とを承認することは
                 alert();
-                var add = function(a, b) {
-                    return a +
-                    b;
-                }
                 alert(";
                 function foo( {
                     console.log("// This is not comment.");
                 }""";
+
+            assertThat(result.trim()).isEqualTo(expect);
+        }
+
+        @Test
+        @DisplayName("だいたいいい感じにコメントを削除できる")
+        void testRemoveCommentBrokenSyntax2() throws IOException {
+            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+            byte[] bytes = classloader.getResourceAsStream("broken-syntax-2.js").readAllBytes();
+
+            String code = new String(bytes, StandardCharsets.UTF_8);
+            var result = TSPlayground.removeComment(javascript, code);
+
+            String expect = """
+                (function() {
+                    var x = 42
+                        y = (function() {
+                            return x * 2
+                        })()
+                                
+                        z = (() => {
+                            try {
+                                return JSON.parse(
+                                    '{"a": 1, "b": "2", "c": [3, 4, {"d": 5}]}'
+                                ).c[2].d
+                            catch (e) {
+                                return 0
+                            }
+                        })()
+                                
+                    var result = y +
+                        z;
+                                
+                    setTimeout(() => {
+                        console.log(result);
+                                
+                        new Promise((resolve, reject) => {
+                            Math.random() > 0.5 ?
+                                resolve('Success') :
+                                reject('Failure')
+                        }).then(msg => {
+                            console.log(msg);
+                        }).catch(err => {
+                            console.warn(err);
+                        }
+                    }, 100)
+                                
+                    var a = Math.random() > 0.5 ?
+                        (Math.random() > 0.5 ? 'A' : 'B') : 'C'
+                                
+                    console.log(a);
+                                
+                    var factorial = n =>
+                        n <= 1 ? 1 :
+                        n * factorial(n - 1
+                    console.log(factorial(5))
+                })();""";
 
             assertThat(result.trim()).isEqualTo(expect);
         }
