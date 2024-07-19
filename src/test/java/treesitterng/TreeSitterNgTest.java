@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class Playground {
+public class TreeSitterNgTest {
     @Test
     void emojiOverflowTest() {
         // https://github.com/bonede/tree-sitter-ng/issues/36
