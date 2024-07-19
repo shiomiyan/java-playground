@@ -252,5 +252,26 @@ public class TSPlaygroundTest {
 
             assertThat(result.trim()).isEqualTo(expect);
         }
+
+        @Test
+        @DisplayName("JQueryでもいけちゃうよ")
+        void testRemoveCommentFromJQuery() throws IOException {
+            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+            byte[] bytes = classloader.getResourceAsStream("comment-jquery.js").readAllBytes();
+
+            String code = new String(bytes, StandardCharsets.UTF_8);
+            var result = TSPlayground.removeComment(javascript, code);
+
+            String expect = """
+                $(document).ready(function() {
+                    $("#changeTextButton").click(
+                        function() {
+                        $("#message").text(
+                            "AWESOME MESSAGE!");
+                    });
+                });""";
+
+            assertThat(result.trim()).isEqualTo(expect);
+        }
     }
 }
