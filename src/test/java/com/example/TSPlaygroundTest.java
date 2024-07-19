@@ -18,7 +18,7 @@ public class TSPlaygroundTest {
         TSLanguage javascript = new TreeSitterJavascript();
 
         @Test
-        @DisplayName("単一行コメントを削除できること")
+        @DisplayName("単一行コメントを削除できる")
         void testRemoveSingleLineComment() throws IOException {
             byte[] bytes = """
                 // COMMENT HERE
@@ -34,7 +34,7 @@ public class TSPlaygroundTest {
         }
 
         @Test
-        @DisplayName("複数行コメントを削除できること")
+        @DisplayName("複数行コメントを削除できる")
         void testRemoveMultiLineComment() throws IOException {
             byte[] bytes = """
                 /*
@@ -53,7 +53,7 @@ public class TSPlaygroundTest {
         }
 
         @Test
-        @DisplayName("イカれたコメントを削除できること")
+        @DisplayName("イカれたコメントを削除できる")
         void testRemoveCrazyComment() throws IOException {
             byte[] bytes = """
                 var add = function(a, b) {
@@ -75,7 +75,7 @@ public class TSPlaygroundTest {
         }
 
         @Test
-        @DisplayName("構文エラーを含むコードでもコメントを削除できること")
+        @DisplayName("構文エラーを含むコードでもコメントを削除できる")
         void testRemoveCommentWithInvalidSyntax() throws IOException {
             byte[] bytes = """
                 // 文字列が閉じられていない + 閉じカッコがない
@@ -97,7 +97,7 @@ public class TSPlaygroundTest {
         }
 
         @Test
-        @DisplayName("サロゲートペア（絵文字）が混入してもコメントを削除できること（UTF-8）")
+        @DisplayName("サロゲートペア（絵文字）が混入してもコメントを削除できる（UTF-8）")
         void testRemoveCommentWithEmojiUtf8() throws IOException {
             String yoshi = Character.toString(0x20bb7);
             byte[] bytes = String.format("""
@@ -123,7 +123,7 @@ public class TSPlaygroundTest {
         }
 
         @Test
-        @DisplayName("サロゲートペア（絵文字）が混入してもコメントを削除できること（UTF-16）")
+        @DisplayName("サロゲートペア（絵文字）が混入してもコメントを削除できる（UTF-16）")
         void testRemoveCommentWithEmojiUtf16() throws IOException {
             String yoshi = Character.toString(0x20bb7);
             byte[] bytes = String.format("""
@@ -149,7 +149,7 @@ public class TSPlaygroundTest {
         }
 
         @Test
-        @DisplayName("サロゲートペア（絵文字）が混入してもコメントを削除できること（Shift_JIS）")
+        @DisplayName("サロゲートペア（絵文字）が混入してもコメントを削除できる（Shift_JIS）")
         void testRemoveCommentWithEmojiShiftJIS() throws IOException {
             String shikaru = Character.toString(0x20b9f);
             byte[] bytes = String.format("""
