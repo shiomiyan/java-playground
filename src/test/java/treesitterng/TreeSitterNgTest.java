@@ -1,16 +1,22 @@
 package treesitterng;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.treesitter.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.treesitter.TSInputEncoding;
+import org.treesitter.TSLanguage;
+import org.treesitter.TSNode;
+import org.treesitter.TSParser;
+import org.treesitter.TSTree;
+import org.treesitter.TreeSitterJavascript;
+import org.treesitter.TreeSitterJson;
 
 public class TreeSitterNgTest {
+
     @Test
     void emojiOverflowTest() {
         // https://github.com/bonede/tree-sitter-ng/issues/36
@@ -20,14 +26,14 @@ public class TreeSitterNgTest {
         parser.setLanguage(javascript);
 
         String code = """
-                // 😭
-                a();
-                // 😭
-                b();
-                // 😭
-                c();
-                // 😭
-                d();""";
+            // 😭
+            a();
+            // 😭
+            b();
+            // 😭
+            c();
+            // 😭
+            d();""";
 
         TSTree tree = parser.parseString(null, code);
         TSNode rootNode = tree.getRootNode();
@@ -49,8 +55,8 @@ public class TreeSitterNgTest {
         parser.setLanguage(javascript);
 
         String code = """
-                // 😭
-                foo();""";
+            // 😭
+            foo();""";
 
         TSTree tree = parser.parseString(null, code);
         TSNode rootNode = tree.getRootNode();
@@ -75,7 +81,7 @@ public class TreeSitterNgTest {
         parser.setLanguage(javascript);
 
         String code = """
-                ["😭", "foo"]""";
+            ["😭", "foo"]""";
 
         TSTree tree = parser.parseString(null, code);
         TSNode rootNode = tree.getRootNode();
@@ -94,6 +100,7 @@ public class TreeSitterNgTest {
 
     @Nested
     public class GettingStarted {
+
         TSParser parser = new TSParser();
         TSLanguage javascript = new TreeSitterJavascript();
 
@@ -105,10 +112,11 @@ public class TreeSitterNgTest {
         @Test
         void testGetCommentNode() {
             String code = """
-                    // COMMENT HERE
-                    var s;
-                    """;
-            TSTree tree = parser.parseStringEncoding(null, code, TSInputEncoding.TSInputEncodingUTF8);
+                // COMMENT HERE
+                var s;
+                """;
+            TSTree tree = parser.parseStringEncoding(null, code,
+                TSInputEncoding.TSInputEncodingUTF8);
             TSNode rootNode = tree.getRootNode();
 
             assertThat(rootNode.getChildCount()).isEqualTo(2);
@@ -123,8 +131,10 @@ public class TreeSitterNgTest {
 
             // バイト配列から部分文字列を取り出す
             byte[] codeBytes = code.getBytes(StandardCharsets.UTF_8);
-            byte[] commentBytes = Arrays.copyOfRange(codeBytes, commentNode.getStartByte(), commentNode.getEndByte());
-            assertThat(new String(commentBytes, StandardCharsets.UTF_8)).isEqualTo("// COMMENT HERE");
+            byte[] commentBytes = Arrays.copyOfRange(codeBytes, commentNode.getStartByte(),
+                commentNode.getEndByte());
+            assertThat(new String(commentBytes, StandardCharsets.UTF_8)).isEqualTo(
+                "// COMMENT HERE");
         }
     }
 }

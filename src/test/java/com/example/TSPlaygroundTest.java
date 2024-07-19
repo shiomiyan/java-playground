@@ -1,32 +1,34 @@
 package com.example;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
-import org.junit.jupiter.api.*;
-import org.treesitter.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.treesitter.TSLanguage;
+import org.treesitter.TreeSitterJavascript;
 
 public class TSPlaygroundTest {
 
     @Nested
     public class TSPlaygroundForJavascript {
-        TSPlayground playground = new TSPlayground();
+
         TSLanguage javascript = new TreeSitterJavascript();
 
         @Test
         @DisplayName("単一行コメントを削除できること")
         void testRemoveSingleLineComment() throws IOException {
             byte[] bytes = """
-                    // COMMENT HERE
-                    const s = "STRING HERE"; // COMMENT HERE""".getBytes(StandardCharsets.UTF_8);
+                // COMMENT HERE
+                const s = "STRING HERE"; // COMMENT HERE""".getBytes(StandardCharsets.UTF_8);
 
             String code = new String(bytes, StandardCharsets.UTF_8);
-            var result = playground.removeComment(javascript, code);
+            var result = TSPlayground.removeComment(javascript, code);
 
             String expect = """
-                    const s = "STRING HERE";""";
+                const s = "STRING HERE";""";
 
             assertThat(result.trim()).isEqualTo(expect);
         }
@@ -35,17 +37,17 @@ public class TSPlaygroundTest {
         @DisplayName("複数行コメントを削除できること")
         void testRemoveMultiLineComment() throws IOException {
             byte[] bytes = """
-                    /*
-                    COMMENT HERE
-                    COMMENT HERE
-                    */
-                    const s = "STRING HERE"; /* COMMENT HERE */""".getBytes(StandardCharsets.UTF_8);
+                /*
+                COMMENT HERE
+                COMMENT HERE
+                */
+                const s = "STRING HERE"; /* COMMENT HERE */""".getBytes(StandardCharsets.UTF_8);
 
             String code = new String(bytes, StandardCharsets.UTF_8);
-            var result = playground.removeComment(javascript, code);
+            var result = TSPlayground.removeComment(javascript, code);
 
             String expect = """
-                    const s = "STRING HERE";""";
+                const s = "STRING HERE";""";
 
             assertThat(result.trim()).isEqualTo(expect);
         }
@@ -54,20 +56,20 @@ public class TSPlaygroundTest {
         @DisplayName("イカれたコメントを削除できること")
         void testRemoveCrazyComment() throws IOException {
             byte[] bytes = """
-                    var add = function(a, b) {
-                        return a +
-                        // CRAZY COMMENT
-                        b;
-                    }""".getBytes(StandardCharsets.UTF_8);
+                var add = function(a, b) {
+                    return a +
+                    // CRAZY COMMENT
+                    b;
+                }""".getBytes(StandardCharsets.UTF_8);
 
             String code = new String(bytes, StandardCharsets.UTF_8);
-            var result = playground.removeComment(javascript, code);
+            var result = TSPlayground.removeComment(javascript, code);
 
             String expect = """
-                    var add = function(a, b) {
-                        return a +
-                        b;
-                    }""";
+                var add = function(a, b) {
+                    return a +
+                    b;
+                }""";
 
             assertThat(result.trim()).isEqualTo(expect);
         }
@@ -76,20 +78,20 @@ public class TSPlaygroundTest {
         @DisplayName("構文エラーを含むコードでもコメントを削除できること")
         void testRemoveCommentWithInvalidSyntax() throws IOException {
             byte[] bytes = """
-                    // 文字列が閉じられていない + 閉じカッコがない
-                    alert("foo;
-                    /*
-                    閉じカッコを忘れたメソッド
-                    */
-                    function ( { console.log("foo"); }
-                    """.getBytes(StandardCharsets.UTF_8);
+                // 文字列が閉じられていない + 閉じカッコがない
+                alert("foo;
+                /*
+                閉じカッコを忘れたメソッド
+                */
+                function ( { console.log("foo"); }
+                """.getBytes(StandardCharsets.UTF_8);
 
             String code = new String(bytes, StandardCharsets.UTF_8);
-            var result = playground.removeComment(javascript, code);
+            var result = TSPlayground.removeComment(javascript, code);
 
             String expect = """
-                    alert("foo;
-                    function ( { console.log("foo"); }""";
+                alert("foo;
+                function ( { console.log("foo"); }""";
 
             assertThat(result.trim()).isEqualTo(expect);
         }
@@ -105,21 +107,17 @@ public class TSPlaygroundTest {
                     function foo() {
                         var %s = "ﾖｼ";
                     }
-                    """,
-                    Character.toString(0x29E3D),
-                    Character.toString(0x0263A),
-                    Character.toString(0x09AD9),
-                    yoshi
-            ).getBytes(StandardCharsets.UTF_8);
+                    """, Character.toString(0x29E3D), Character.toString(0x0263A),
+                Character.toString(0x09AD9), yoshi).getBytes(StandardCharsets.UTF_8);
 
             String code = new String(bytes, StandardCharsets.UTF_8);
-            var result = playground.removeComment(javascript, code);
+            var result = TSPlayground.removeComment(javascript, code);
 
             String expect = String.format("""
-                    alert("STRING HERE");
-                    function foo() {
-                        var %s = "ﾖｼ";
-                    }""", yoshi);
+                alert("STRING HERE");
+                function foo() {
+                    var %s = "ﾖｼ";
+                }""", yoshi);
 
             assertThat(result.trim()).isEqualTo(expect);
         }
@@ -135,21 +133,17 @@ public class TSPlaygroundTest {
                     function foo() {
                         var %s = "ﾖｼ";
                     }
-                    """,
-                    Character.toString(0x29E3D),
-                    Character.toString(0x0263A),
-                    Character.toString(0x09AD9),
-                    yoshi
-            ).getBytes(StandardCharsets.UTF_16);
+                    """, Character.toString(0x29E3D), Character.toString(0x0263A),
+                Character.toString(0x09AD9), yoshi).getBytes(StandardCharsets.UTF_16);
 
             String code = new String(bytes, StandardCharsets.UTF_16);
-            var result = playground.removeComment(javascript, code);
+            var result = TSPlayground.removeComment(javascript, code);
 
             String expect = String.format("""
-                    alert("STRING HERE");
-                    function foo() {
-                        var %s = "ﾖｼ";
-                    }""", yoshi);
+                alert("STRING HERE");
+                function foo() {
+                    var %s = "ﾖｼ";
+                }""", yoshi);
 
             assertThat(result.trim()).isEqualTo(expect);
         }
@@ -165,21 +159,17 @@ public class TSPlaygroundTest {
                     function foo() {
                         var %s = "ｼｶﾙ";
                     }
-                    """,
-                    Character.toString(0x29E3D),
-                    Character.toString(0x0263A),
-                    Character.toString(0x09AD9),
-                    shikaru
-            ).getBytes("SJIS");
+                    """, Character.toString(0x29E3D), Character.toString(0x0263A),
+                Character.toString(0x09AD9), shikaru).getBytes("SJIS");
 
             String code = new String(bytes, "SJIS");
-            var result = playground.removeComment(javascript, code);
+            var result = TSPlayground.removeComment(javascript, code);
 
             String expect = new String("""
-                    alert("STRING HERE");
-                    function foo() {
-                        var %s = "ｼｶﾙ";
-                    }""".formatted(shikaru).getBytes("SJIS"), "SJIS");
+                alert("STRING HERE");
+                function foo() {
+                    var %s = "ｼｶﾙ";
+                }""".formatted(shikaru).getBytes("SJIS"), "SJIS");
 
             assertThat(result.trim()).isEqualTo(expect);
         }
@@ -192,23 +182,22 @@ public class TSPlaygroundTest {
             byte[] bytes = classloader.getResourceAsStream("main.js").readAllBytes();
 
             String code = new String(bytes, StandardCharsets.UTF_8);
-            var result = playground.removeComment(javascript, code);
+            var result = TSPlayground.removeComment(javascript, code);
 
             String expect = """
-                    const s = "STRING HERE";
-                    人類社会のすべての構成員の固有の尊厳と平等で譲ることのできない権利とを承認することは
-                    alert();
-                    var add = function(a, b) {
-                        return a +
-                        b;
-                    }
-                    alert(";
-                    function foo( {
-                        console.log("// This is not comment.");
-                    }""";
+                const s = "STRING HERE";
+                人類社会のすべての構成員の固有の尊厳と平等で譲ることのできない権利とを承認することは
+                alert();
+                var add = function(a, b) {
+                    return a +
+                    b;
+                }
+                alert(";
+                function foo( {
+                    console.log("// This is not comment.");
+                }""";
 
             assertThat(result.trim()).isEqualTo(expect);
         }
     }
-
 }
